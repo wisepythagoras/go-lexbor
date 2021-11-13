@@ -125,6 +125,14 @@ func (d *Document) ChangeTitle(title string) bool {
 	return true
 }
 
+func (d *Document) DomDocument() *C.lxb_dom_document_t {
+	if d.lexborDoc == nil {
+		return nil
+	}
+
+	return &d.lexborDoc.dom_document
+}
+
 func (d *Document) Destroy() {
 	C.lxb_html_document_destroy(d.lexborDoc)
 }
