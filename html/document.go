@@ -102,6 +102,29 @@ func (d *Document) DomInterfaceNode() *Node {
 	return node
 }
 
+func (d *Document) Title() string {
+	if d.lexborDoc == nil {
+		return ""
+	}
+
+	var title_len C.size_t
+	title := C.lxb_html_document_title(d.lexborDoc, &title_len)
+
+	return C.GoString((*C.char)(unsafe.Pointer(title)))
+}
+
+func (d *Document) ChangeTitle(title string) bool {
+	uCharPtrTitle := (*C.uchar)(unsafe.Pointer(C.CString(title)))
+	titleLen := (C.ulong)(len(title))
+	status := C.lxb_html_document_title_set(d.lexborDoc, uCharPtrTitle, titleLen)
+
+	if status != C.LXB_STATUS_OK {
+		return false
+	}
+
+	return true
+}
+
 func (d *Document) Destroy() {
 	C.lxb_html_document_destroy(d.lexborDoc)
 }
