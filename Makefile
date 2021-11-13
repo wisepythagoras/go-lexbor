@@ -2,3 +2,4 @@
 
 examples:
 	+$(MAKE) -C examples/html/document_parse
+	+$(MAKE) -C examples/html/document_parse_chunk

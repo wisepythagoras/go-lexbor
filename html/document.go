@@ -61,6 +61,25 @@ func (d *Document) Parse(html string) bool {
 	return true
 }
 
+func (d *Document) ParseChunks(htmlChunks []string) bool {
+	status := C.lxb_html_document_parse_chunk_begin(d.lexborDoc)
+
+	if status != C.LXB_STATUS_OK {
+		return false
+	}
+
+	for _, chunk := range htmlChunks {
+		uCharChunk := (*C.uchar)(unsafe.Pointer(C.CString(chunk)))
+		status = C.lxb_html_document_parse_chunk(d.lexborDoc, uCharChunk, (C.ulong)(len(chunk)))
+
+		if status != C.LXB_STATUS_OK {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (d *Document) BodyElement() *BodyElement {
 	bodyElement := C.lxb_html_document_body_element(d.lexborDoc)
 	body := &BodyElement{
