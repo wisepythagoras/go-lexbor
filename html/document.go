@@ -125,17 +125,23 @@ func (d *Document) ChangeTitle(title string) bool {
 	return true
 }
 
-func (d *Document) Tags() (*TagHash, []string) {
+func (d *Document) Tags() (*TagHash, []string, map[string]bool) {
+	// This will contain all tag names.
 	tagNames := make([]string, 0)
+
+	// The tag state will be either true or false based on whether it's a void element
+	tagStates := make(map[string]bool)
+
 	lxbTags := C.lxb_html_document_tags(d.Ptr())
 
 	for tagId := (int)(C.LXB_TAG_A); tagId < (int)(C.LXB_TAG__LAST_ENTRY); tagId++ {
 		var tagNameLen *C.ulong
 		tagName := C.lxb_tag_name_by_id(lxbTags, (C.ulong)(tagId), tagNameLen)
 		tagNames = append(tagNames, CUCharToGoString(tagName))
+		tagStates[CUCharToGoString(tagName)] = (bool)(C.lxb_html_tag_is_void((C.ulong)(tagId)))
 	}
 
-	return &TagHash{lexborTagHash: lxbTags}, tagNames
+	return &TagHash{lexborTagHash: lxbTags}, tagNames, tagStates
 }
 
 func (d *Document) DomDocument() *C.lxb_dom_document_t {
