@@ -125,6 +125,19 @@ func (d *Document) ChangeTitle(title string) bool {
 	return true
 }
 
+func (d *Document) Tags() (*TagHash, []string) {
+	tagNames := make([]string, 0)
+	lxbTags := C.lxb_html_document_tags(d.Ptr())
+
+	for tagId := (int)(C.LXB_TAG_A); tagId < (int)(C.LXB_TAG__LAST_ENTRY); tagId++ {
+		var tagNameLen *C.ulong
+		tagName := C.lxb_tag_name_by_id(lxbTags, (C.ulong)(tagId), tagNameLen)
+		tagNames = append(tagNames, CUCharToGoString(tagName))
+	}
+
+	return &TagHash{lexborTagHash: lxbTags}, tagNames
+}
+
 func (d *Document) DomDocument() *C.lxb_dom_document_t {
 	if d.lexborDoc == nil {
 		return nil
@@ -135,6 +148,10 @@ func (d *Document) DomDocument() *C.lxb_dom_document_t {
 
 func (d *Document) Destroy() {
 	C.lxb_html_document_destroy(d.lexborDoc)
+}
+
+func (d *Document) Ptr() *C.lxb_html_document_t {
+	return d.lexborDoc
 }
 
 func Serialize(node *Node) {
