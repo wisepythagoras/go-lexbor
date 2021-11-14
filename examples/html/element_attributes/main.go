@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/wisepythagoras/go-lexbor/html"
 )
@@ -33,13 +34,37 @@ func main() {
 
 	elements := collection.DomElementsByTagName("div", element)
 
-	for _, el := range elements {
-		id := el.Attribute("id")
+	for i, el := range elements {
+		if el.HasAttribute("id") {
+			id := el.Attribute("id")
 
-		if len(id) > 0 {
 			fmt.Println("Found id:", id)
+		}
+
+		wasSet := el.SetAttribute("test-attr", "val-"+strconv.FormatInt(int64(i), 10))
+
+		if !wasSet {
+			fmt.Println("Unable to set test attribute on", i)
 		}
 	}
 
+	element = collection.Element(0)
+	attr := element.FirstAttribute()
+
+	for attr != nil {
+		fmt.Println(attr.QualifiedName(), "=>", attr.Value())
+		attr = element.NextAttribute(attr)
+	}
+
+	domAttr := element.AttributeByName("id")
+
+	if domAttr != nil && !domAttr.SetValue("alternate-id") {
+		fmt.Println("Unable to set the new alternate id")
+	}
+
+	fmt.Println("New HTML Tree:")
+	html.Serialize(docNode)
+
+	collection.Destroy()
 	doc.Destroy()
 }

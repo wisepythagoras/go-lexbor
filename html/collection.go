@@ -45,6 +45,10 @@ func (c *Collection) DomElementsByTagName(tagName string, el *Element) []*Elemen
 	return elements
 }
 
+func (c *Collection) Destroy() {
+	C.lxb_dom_collection_destroy(c.lxbCollection, true)
+}
+
 func CreateDomCollection(doc *Document, size int) *Collection {
 	lxbCollection := C.lxb_dom_collection_make(doc.DomDocument(), (C.ulong)(size))
 
