@@ -2,7 +2,10 @@ package html
 
 // #include <lexbor/html/html.h>
 import "C"
-import "unsafe"
+import (
+	"errors"
+	"unsafe"
+)
 
 type Element struct {
 	lexborElement *C.lxb_dom_element_t
@@ -68,6 +71,23 @@ func (e *Element) AttributeByName(attr string) *DomAttr {
 	}
 
 	return &DomAttr{lexborDomAttr: domAttr}
+}
+
+func (e *Element) SetInnerHTML(innerHTML string) error {
+	cInner := GoStringToCUChar(innerHTML)
+	innerLen := CLen(innerHTML)
+	el := C.lxb_html_element_inner_html_set(e.HTMLElement().Ptr(), cInner, innerLen)
+
+	if el == nil {
+		return errors.New("Failed to parse inner HTML")
+	}
+
+	return nil
+}
+
+func (e *Element) HTMLElement() *HTMLElement {
+	lxbHTMLEl := (*C.lxb_html_element_t)(unsafe.Pointer(e.Ptr()))
+	return &HTMLElement{lexborHTMLEl: lxbHTMLEl}
 }
 
 func (e *Element) Node() *Node {

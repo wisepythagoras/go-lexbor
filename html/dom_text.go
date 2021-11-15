@@ -15,6 +15,11 @@ func (d *DomText) Node() *Node {
 	return &Node{lexborNode: lxbNode}
 }
 
+func (d *DomText) HTMLElement() *HTMLElement {
+	lxbHTMLEl := (*C.lxb_html_element_t)(unsafe.Pointer(d.Ptr()))
+	return &HTMLElement{lexborHTMLEl: lxbHTMLEl}
+}
+
 func (d *DomText) Ptr() *C.lxb_dom_text_t {
 	return d.lexborDomText
 }
