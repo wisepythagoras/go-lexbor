@@ -20,14 +20,23 @@ func main() {
 
 	fmt.Println(tags, tagStates)
 
+	for _, tagName := range tags {
+		newElem := doc.CreateElement(tagName)
+
+		if newElem == nil {
+			continue
+		}
+
+		if !tagStates[tagName] {
+			textNode := doc.CreateTextNode("This is a \"" + tagName + "\" node")
+			newElem.Node().InsertChild(textNode.Node())
+		}
+
+		body := doc.BodyElement()
+		body.Element().Node().InsertChild(newElem.Node())
+	}
+
 	docNode := doc.DomInterfaceNode()
-	newElem := doc.CreateElement("span")
-	textNode := doc.CreateTextNode("This is some text")
-	newElem.Node().InsertChild(textNode.Node())
-
-	body := doc.BodyElement()
-	body.Element().Node().InsertChild(newElem.Node())
-
 	fmt.Println("HTML Tree:")
 	html.Serialize(docNode)
 
