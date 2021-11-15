@@ -21,6 +21,8 @@ func main() {
 	fmt.Println(tags, tagStates)
 
 	docNode := doc.DomInterfaceNode()
+	newElem := doc.CreateElement("span")
+	fmt.Println(newElem)
 
 	fmt.Println("HTML Tree:")
 	html.Serialize(docNode)

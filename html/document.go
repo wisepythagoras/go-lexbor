@@ -144,6 +144,19 @@ func (d *Document) Tags() (*TagHash, []string, map[string]bool) {
 	return &TagHash{lexborTagHash: lxbTags}, tagNames, tagStates
 }
 
+func (d *Document) CreateElement(name string) *Element {
+	cName := GoStringToCUChar(name)
+	nameLen := CLen(name)
+
+	lxbElement := C.lxb_dom_document_create_element(d.DomDocument(), cName, nameLen, nil)
+
+	if lxbElement == nil {
+		return nil
+	}
+
+	return &Element{lexborElement: lxbElement}
+}
+
 func (d *Document) DomDocument() *C.lxb_dom_document_t {
 	if d.lexborDoc == nil {
 		return nil
