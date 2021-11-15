@@ -2,6 +2,7 @@ package html
 
 // #include <lexbor/html/html.h>
 import "C"
+import "unsafe"
 
 type Element struct {
 	lexborElement *C.lxb_dom_element_t
@@ -67,6 +68,11 @@ func (e *Element) AttributeByName(attr string) *DomAttr {
 	}
 
 	return &DomAttr{lexborDomAttr: domAttr}
+}
+
+func (e *Element) Node() *Node {
+	lxbNode := (*C.lxb_dom_node_t)(unsafe.Pointer(e.Ptr()))
+	return &Node{lexborNode: lxbNode}
 }
 
 func (e *Element) Ptr() *C.lxb_dom_element_t {

@@ -157,6 +157,19 @@ func (d *Document) CreateElement(name string) *Element {
 	return &Element{lexborElement: lxbElement}
 }
 
+func (d *Document) CreateTextNode(text string) *DomText {
+	cText := GoStringToCUChar(text)
+	textLen := CLen(text)
+
+	domText := C.lxb_dom_document_create_text_node(d.DomDocument(), cText, textLen)
+
+	if domText == nil {
+		return nil
+	}
+
+	return &DomText{lexborDomText: domText}
+}
+
 func (d *Document) DomDocument() *C.lxb_dom_document_t {
 	if d.lexborDoc == nil {
 		return nil
