@@ -6,3 +6,4 @@ examples:
 	+$(MAKE) -C examples/html/document_title
 	+$(MAKE) -C examples/html/element_attributes
 	+$(MAKE) -C examples/html/element_create
+	+$(MAKE) -C examples/html/element_inner_html
