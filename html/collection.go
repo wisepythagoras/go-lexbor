@@ -74,6 +74,16 @@ func (c *Collection) DomElementsByAttr(attr string, val string, el *Element) []*
 	return elements
 }
 
+func (c *Collection) Elements() []*Element {
+	elements := make([]*Element, 0)
+
+	for i := 0; i < c.Length(); i++ {
+		elements = append(elements, c.Element(i))
+	}
+
+	return elements
+}
+
 func (c *Collection) Destroy() {
 	C.lxb_dom_collection_destroy(c.ptr, true)
 }
