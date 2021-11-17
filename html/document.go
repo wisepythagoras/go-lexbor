@@ -34,6 +34,7 @@ serialize(lxb_dom_node_t *node)
 */
 import "C"
 import (
+	"errors"
 	"unsafe"
 )
 
@@ -172,6 +173,24 @@ func (d *Document) CreateTextNode(text string) *DomText {
 	}
 
 	return &DomText{lexborDomText: domText}
+}
+
+func (d *Document) GetElementById(id string) (*Element, error) {
+	elements, err := d.BodyElement().Element().ElementsByAttr("id", id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(elements) == 0 {
+		return nil, errors.New("Element with this id not found")
+	}
+
+	return elements[0], nil
+}
+
+func (d *Document) GetElementsByTagName(tagName string) ([]*Element, error) {
+	return d.BodyElement().Element().ElementsByTagName(tagName)
 }
 
 func (d *Document) DomDocument() *C.lxb_dom_document_t {

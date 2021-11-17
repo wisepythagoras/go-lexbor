@@ -121,6 +121,26 @@ func (e *Element) ElementsByAttr(attr string, val string) ([]*Element, error) {
 	return elements, nil
 }
 
+func (e *Element) ElementsByTagName(tagName string) ([]*Element, error) {
+	cTagName := (*C.uchar)(unsafe.Pointer(C.CString(tagName)))
+	tagNameLen := (C.ulong)(len(tagName))
+	elements := make([]*Element, 0)
+
+	// The size here should be dynamic.
+	collection := CreateDomCollection(e.document, 128)
+	status := C.lxb_dom_elements_by_tag_name(e.Ptr(), collection.ptr, cTagName, tagNameLen)
+
+	if status != C.LXB_STATUS_OK {
+		return elements, errors.New("Unable to get elments by tag name")
+	}
+
+	for i := 0; i < collection.Length(); i++ {
+		elements = append(elements, collection.Element(i))
+	}
+
+	return elements, nil
+}
+
 func (e *Element) HTMLElement() *HTMLElement {
 	lxbHTMLEl := (*C.lxb_html_element_t)(unsafe.Pointer(e.Ptr()))
 	return &HTMLElement{lexborHTMLEl: lxbHTMLEl}

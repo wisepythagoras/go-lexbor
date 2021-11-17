@@ -20,10 +20,13 @@ func main() {
 
 	elements, _ := body.Element().ElementsByAttr("id", "hello")
 
-	fmt.Println(elements[0].HasAttribute("id"))
-
 	fmt.Println("The element:")
 	html.Serialize(elements[0].Node())
+
+	element, _ := doc.GetElementById("hello")
+
+	fmt.Println("The element:")
+	html.Serialize(element.Node())
 
 	doc.Destroy()
 }
