@@ -7,15 +7,16 @@ import (
 )
 
 type Collection struct {
-	lxbCollection *C.lxb_dom_collection_t
+	ptr      *C.lxb_dom_collection_t
+	document *Document
 }
 
 func (c *Collection) Length() int {
-	return int(c.lxbCollection.array.length)
+	return int(c.ptr.array.length)
 }
 
 func (c *Collection) Size() int {
-	return int(c.lxbCollection.array.size)
+	return int(c.ptr.array.size)
 }
 
 func (c *Collection) Element(idx int) *Element {
@@ -24,7 +25,8 @@ func (c *Collection) Element(idx int) *Element {
 	}
 
 	return &Element{
-		lexborElement: C.lxb_dom_collection_element(c.lxbCollection, (C.ulong)(idx)),
+		lexborElement: C.lxb_dom_collection_element(c.ptr, (C.ulong)(idx)),
+		document:      c.document,
 	}
 }
 
@@ -32,7 +34,34 @@ func (c *Collection) DomElementsByTagName(tagName string, el *Element) []*Elemen
 	cTagName := (*C.uchar)(unsafe.Pointer(C.CString(tagName)))
 	tagNameLen := (C.ulong)(len(tagName))
 	elements := make([]*Element, 0)
-	status := C.lxb_dom_elements_by_tag_name(el.Ptr(), c.lxbCollection, cTagName, tagNameLen)
+	status := C.lxb_dom_elements_by_tag_name(el.Ptr(), c.ptr, cTagName, tagNameLen)
+
+	if status != C.LXB_STATUS_OK || c.Length() == 0 {
+		return elements
+	}
+
+	for i := 0; i < c.Length(); i++ {
+		elements = append(elements, c.Element(i))
+	}
+
+	return elements
+}
+
+func (c *Collection) DomElementsByAttr(attr string, val string, el *Element) []*Element {
+	cAttr := (*C.uchar)(unsafe.Pointer(C.CString(attr)))
+	attrLen := (C.ulong)(len(attr))
+	cVal := (*C.uchar)(unsafe.Pointer(C.CString(val)))
+	valLen := (C.ulong)(len(val))
+	elements := make([]*Element, 0)
+	status := C.lxb_dom_elements_by_attr(
+		el.Ptr(),
+		c.ptr,
+		cAttr,
+		attrLen,
+		cVal,
+		valLen,
+		true,
+	)
 
 	if status != C.LXB_STATUS_OK || c.Length() == 0 {
 		return elements
@@ -46,15 +75,18 @@ func (c *Collection) DomElementsByTagName(tagName string, el *Element) []*Elemen
 }
 
 func (c *Collection) Destroy() {
-	C.lxb_dom_collection_destroy(c.lxbCollection, true)
+	C.lxb_dom_collection_destroy(c.ptr, true)
 }
 
 func CreateDomCollection(doc *Document, size int) *Collection {
-	lxbCollection := C.lxb_dom_collection_make(doc.DomDocument(), (C.ulong)(size))
+	ptr := C.lxb_dom_collection_make(doc.DomDocument(), (C.ulong)(size))
 
-	if lxbCollection == nil {
+	if ptr == nil {
 		return nil
 	}
 
-	return &Collection{lxbCollection: lxbCollection}
+	return &Collection{
+		ptr:      ptr,
+		document: doc,
+	}
 }

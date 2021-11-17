@@ -9,6 +9,7 @@ import (
 
 type Element struct {
 	lexborElement *C.lxb_dom_element_t
+	document      *Document
 }
 
 func (e *Element) Attribute(attr string) string {
@@ -83,6 +84,41 @@ func (e *Element) SetInnerHTML(innerHTML string) error {
 	}
 
 	return nil
+}
+
+func (e *Element) ElementsByAttr(attr string, val string) ([]*Element, error) {
+	elements := make([]*Element, 0)
+
+	if e.document == nil {
+		return elements, errors.New("No document in context")
+	}
+
+	cAttr := (*C.uchar)(unsafe.Pointer(C.CString(attr)))
+	attrLen := (C.ulong)(len(attr))
+	cVal := (*C.uchar)(unsafe.Pointer(C.CString(val)))
+	valLen := (C.ulong)(len(val))
+
+	// The size here should be dynamic.
+	collection := CreateDomCollection(e.document, 128)
+	status := C.lxb_dom_elements_by_attr(
+		e.Ptr(),
+		collection.ptr,
+		cAttr,
+		attrLen,
+		cVal,
+		valLen,
+		true,
+	)
+
+	if status != C.LXB_STATUS_OK {
+		return elements, errors.New("Unable to get elments by attribute")
+	}
+
+	for i := 0; i < collection.Length(); i++ {
+		elements = append(elements, collection.Element(i))
+	}
+
+	return elements, nil
 }
 
 func (e *Element) HTMLElement() *HTMLElement {

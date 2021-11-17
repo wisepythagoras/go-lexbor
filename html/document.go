@@ -84,6 +84,7 @@ func (d *Document) BodyElement() *BodyElement {
 	bodyElement := C.lxb_html_document_body_element(d.lexborDoc)
 	body := &BodyElement{
 		lexborElement: bodyElement,
+		document:      d,
 	}
 
 	return body
@@ -154,7 +155,10 @@ func (d *Document) CreateElement(name string) *Element {
 		return nil
 	}
 
-	return &Element{lexborElement: lxbElement}
+	return &Element{
+		lexborElement: lxbElement,
+		document:      d,
+	}
 }
 
 func (d *Document) CreateTextNode(text string) *DomText {
