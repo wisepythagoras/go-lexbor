@@ -25,8 +25,8 @@ func (c *Collection) Element(idx int) *Element {
 	}
 
 	return &Element{
-		lexborElement: C.lxb_dom_collection_element(c.ptr, (C.ulong)(idx)),
-		document:      c.document,
+		ptr:      C.lxb_dom_collection_element(c.ptr, (C.ulong)(idx)),
+		document: c.document,
 	}
 }
 

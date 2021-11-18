@@ -39,21 +39,21 @@ import (
 )
 
 type Document struct {
-	lexborDoc *C.lxb_html_document_t
+	ptr *C.lxb_html_document_t
 }
 
 func (d *Document) Create() {
 	document := C.lxb_html_document_create()
-	d.lexborDoc = document
+	d.ptr = document
 }
 
 func (d *Document) Parse(html string) bool {
-	if d.lexborDoc == nil {
+	if d.ptr == nil {
 		return false
 	}
 
 	unsafeHtml := unsafe.Pointer(C.CString(html))
-	status := C.lxb_html_document_parse(d.lexborDoc, (*C.uchar)(unsafeHtml), (C.ulong)(len(html)))
+	status := C.lxb_html_document_parse(d.ptr, (*C.uchar)(unsafeHtml), (C.ulong)(len(html)))
 
 	if status != C.LXB_STATUS_OK {
 		return false
@@ -63,7 +63,7 @@ func (d *Document) Parse(html string) bool {
 }
 
 func (d *Document) ParseChunks(htmlChunks []string) bool {
-	status := C.lxb_html_document_parse_chunk_begin(d.lexborDoc)
+	status := C.lxb_html_document_parse_chunk_begin(d.ptr)
 
 	if status != C.LXB_STATUS_OK {
 		return false
@@ -71,7 +71,7 @@ func (d *Document) ParseChunks(htmlChunks []string) bool {
 
 	for _, chunk := range htmlChunks {
 		uCharChunk := (*C.uchar)(unsafe.Pointer(C.CString(chunk)))
-		status = C.lxb_html_document_parse_chunk(d.lexborDoc, uCharChunk, (C.ulong)(len(chunk)))
+		status = C.lxb_html_document_parse_chunk(d.ptr, uCharChunk, (C.ulong)(len(chunk)))
 
 		if status != C.LXB_STATUS_OK {
 			return false
@@ -82,20 +82,20 @@ func (d *Document) ParseChunks(htmlChunks []string) bool {
 }
 
 func (d *Document) BodyElement() *BodyElement {
-	bodyElement := C.lxb_html_document_body_element(d.lexborDoc)
+	bodyElement := C.lxb_html_document_body_element(d.ptr)
 	body := &BodyElement{
-		lexborElement: bodyElement,
-		document:      d,
+		ptr:      bodyElement,
+		document: d,
 	}
 
 	return body
 }
 
 func (d *Document) DomInterfaceNode() *Node {
-	lexborNode := (*C.lxb_dom_node_t)(unsafe.Pointer(d.lexborDoc))
+	lexborNode := (*C.lxb_dom_node_t)(unsafe.Pointer(d.ptr))
 
 	// An alternative way:
-	// lexborNode := C.lxb_dom_interface_node_custom(d.lexborDoc)
+	// lexborNode := C.lxb_dom_interface_node_custom(d.ptr)
 
 	node := &Node{
 		lexborNode: lexborNode,
@@ -105,12 +105,12 @@ func (d *Document) DomInterfaceNode() *Node {
 }
 
 func (d *Document) Title() string {
-	if d.lexborDoc == nil {
+	if d.ptr == nil {
 		return ""
 	}
 
 	var title_len C.size_t
-	title := C.lxb_html_document_title(d.lexborDoc, &title_len)
+	title := C.lxb_html_document_title(d.ptr, &title_len)
 
 	return C.GoString((*C.char)(unsafe.Pointer(title)))
 }
@@ -118,7 +118,7 @@ func (d *Document) Title() string {
 func (d *Document) ChangeTitle(title string) bool {
 	uCharPtrTitle := (*C.uchar)(unsafe.Pointer(C.CString(title)))
 	titleLen := (C.ulong)(len(title))
-	status := C.lxb_html_document_title_set(d.lexborDoc, uCharPtrTitle, titleLen)
+	status := C.lxb_html_document_title_set(d.ptr, uCharPtrTitle, titleLen)
 
 	if status != C.LXB_STATUS_OK {
 		return false
@@ -157,8 +157,8 @@ func (d *Document) CreateElement(name string) *Element {
 	}
 
 	return &Element{
-		lexborElement: lxbElement,
-		document:      d,
+		ptr:      lxbElement,
+		document: d,
 	}
 }
 
@@ -194,19 +194,19 @@ func (d *Document) GetElementsByTagName(tagName string) ([]*Element, error) {
 }
 
 func (d *Document) DomDocument() *C.lxb_dom_document_t {
-	if d.lexborDoc == nil {
+	if d.ptr == nil {
 		return nil
 	}
 
-	return &d.lexborDoc.dom_document
+	return &d.ptr.dom_document
 }
 
 func (d *Document) Destroy() {
-	C.lxb_html_document_destroy(d.lexborDoc)
+	C.lxb_html_document_destroy(d.ptr)
 }
 
 func (d *Document) Ptr() *C.lxb_html_document_t {
-	return d.lexborDoc
+	return d.ptr
 }
 
 func Serialize(node *Node) {

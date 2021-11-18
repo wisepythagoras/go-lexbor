@@ -8,8 +8,8 @@ import (
 )
 
 type Element struct {
-	lexborElement *C.lxb_dom_element_t
-	document      *Document
+	ptr      *C.lxb_dom_element_t
+	document *Document
 }
 
 func (e *Element) Attribute(attr string) string {
@@ -143,5 +143,5 @@ func (e *Element) Node() *Node {
 }
 
 func (e *Element) Ptr() *C.lxb_dom_element_t {
-	return e.lexborElement
+	return e.ptr
 }
