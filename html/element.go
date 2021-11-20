@@ -17,7 +17,7 @@ func (e *Element) Attribute(attr string) string {
 	attrLen := CLen(attr)
 	var valLen *C.ulong
 
-	attrVal := C.lxb_dom_element_get_attribute(e.Ptr(), cAttr, attrLen, valLen)
+	attrVal := C.lxb_dom_element_get_attribute(e.ptr, cAttr, attrLen, valLen)
 
 	return CUCharToGoString(attrVal)
 }
@@ -28,7 +28,7 @@ func (e *Element) SetAttribute(attr string, val string) bool {
 	attrLen := CLen(attr)
 	valLen := CLen(val)
 
-	if C.lxb_dom_element_set_attribute(e.Ptr(), cAttr, attrLen, cVal, valLen) == nil {
+	if C.lxb_dom_element_set_attribute(e.ptr, cAttr, attrLen, cVal, valLen) == nil {
 		return false
 	}
 
@@ -39,11 +39,11 @@ func (e *Element) HasAttribute(attr string) bool {
 	cAttr := GoStringToCUChar(attr)
 	attrLen := CLen(attr)
 
-	return (bool)(C.lxb_dom_element_has_attribute(e.Ptr(), cAttr, attrLen))
+	return (bool)(C.lxb_dom_element_has_attribute(e.ptr, cAttr, attrLen))
 }
 
 func (e *Element) FirstAttribute() *DomAttr {
-	domAttr := C.lxb_dom_element_first_attribute(e.Ptr())
+	domAttr := C.lxb_dom_element_first_attribute(e.ptr)
 
 	if domAttr == nil {
 		return nil
@@ -65,7 +65,7 @@ func (e *Element) NextAttribute(attr *DomAttr) *DomAttr {
 func (e *Element) AttributeByName(attr string) *DomAttr {
 	cAttr := GoStringToCUChar(attr)
 	attrLen := CLen(attr)
-	domAttr := C.lxb_dom_element_attr_by_name(e.Ptr(), cAttr, attrLen)
+	domAttr := C.lxb_dom_element_attr_by_name(e.ptr, cAttr, attrLen)
 
 	if domAttr == nil {
 		return nil
@@ -101,7 +101,7 @@ func (e *Element) ElementsByAttr(attr string, val string) ([]*Element, error) {
 	// The size here should be dynamic.
 	collection := CreateDomCollection(e.document, 128)
 	status := C.lxb_dom_elements_by_attr(
-		e.Ptr(),
+		e.ptr,
 		collection.ptr,
 		cAttr,
 		attrLen,
@@ -123,7 +123,22 @@ func (e *Element) ElementsByTagName(tagName string) ([]*Element, error) {
 
 	// The size here should be dynamic.
 	collection := CreateDomCollection(e.document, 128)
-	status := C.lxb_dom_elements_by_tag_name(e.Ptr(), collection.ptr, cTagName, tagNameLen)
+	status := C.lxb_dom_elements_by_tag_name(e.ptr, collection.ptr, cTagName, tagNameLen)
+
+	if status != C.LXB_STATUS_OK {
+		return make([]*Element, 0), errors.New("Unable to get elments by tag name")
+	}
+
+	return collection.Elements(), nil
+}
+
+func (e *Element) ElementsByClassName(className string) ([]*Element, error) {
+	cClassName := (*C.uchar)(unsafe.Pointer(C.CString(className)))
+	classNameLen := (C.ulong)(len(className))
+
+	// The size here should be dynamic.
+	collection := CreateDomCollection(e.document, 128)
+	status := C.lxb_dom_elements_by_class_name(e.ptr, collection.ptr, cClassName, classNameLen)
 
 	if status != C.LXB_STATUS_OK {
 		return make([]*Element, 0), errors.New("Unable to get elments by tag name")
@@ -133,15 +148,11 @@ func (e *Element) ElementsByTagName(tagName string) ([]*Element, error) {
 }
 
 func (e *Element) HTMLElement() *HTMLElement {
-	lxbHTMLEl := (*C.lxb_html_element_t)(unsafe.Pointer(e.Ptr()))
+	lxbHTMLEl := (*C.lxb_html_element_t)(unsafe.Pointer(e.ptr))
 	return &HTMLElement{lexborHTMLEl: lxbHTMLEl}
 }
 
 func (e *Element) Node() *Node {
-	lxbNode := (*C.lxb_dom_node_t)(unsafe.Pointer(e.Ptr()))
+	lxbNode := (*C.lxb_dom_node_t)(unsafe.Pointer(e.ptr))
 	return &Node{lexborNode: lxbNode}
-}
-
-func (e *Element) Ptr() *C.lxb_dom_element_t {
-	return e.ptr
 }

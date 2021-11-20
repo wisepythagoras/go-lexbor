@@ -34,7 +34,7 @@ func (c *Collection) DomElementsByTagName(tagName string, el *Element) []*Elemen
 	cTagName := (*C.uchar)(unsafe.Pointer(C.CString(tagName)))
 	tagNameLen := (C.ulong)(len(tagName))
 	elements := make([]*Element, 0)
-	status := C.lxb_dom_elements_by_tag_name(el.Ptr(), c.ptr, cTagName, tagNameLen)
+	status := C.lxb_dom_elements_by_tag_name(el.ptr, c.ptr, cTagName, tagNameLen)
 
 	if status != C.LXB_STATUS_OK || c.Length() == 0 {
 		return elements
@@ -54,7 +54,7 @@ func (c *Collection) DomElementsByAttr(attr string, val string, el *Element) []*
 	valLen := (C.ulong)(len(val))
 	elements := make([]*Element, 0)
 	status := C.lxb_dom_elements_by_attr(
-		el.Ptr(),
+		el.ptr,
 		c.ptr,
 		cAttr,
 		attrLen,

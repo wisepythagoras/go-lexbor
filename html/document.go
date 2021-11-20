@@ -193,6 +193,10 @@ func (d *Document) GetElementsByTagName(tagName string) ([]*Element, error) {
 	return d.BodyElement().Element().ElementsByTagName(tagName)
 }
 
+func (d *Document) GetElementsByClassName(tagName string) ([]*Element, error) {
+	return d.BodyElement().Element().ElementsByTagName(tagName)
+}
+
 func (d *Document) DomDocument() *C.lxb_dom_document_t {
 	if d.ptr == nil {
 		return nil

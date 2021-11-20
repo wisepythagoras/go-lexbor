@@ -8,3 +8,4 @@ examples:
 	+$(MAKE) -C examples/html/element_create
 	+$(MAKE) -C examples/html/element_inner_html
 	+$(MAKE) -C examples/html/elements_by_attr
+	+$(MAKE) -C examples/html/elements_by_class_name
