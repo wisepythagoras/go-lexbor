@@ -62,13 +62,14 @@ func main() {
 		fmt.Println("Unable to set the new alternate id")
 	}
 
-	elements, _ = doc.GetElementsByTagName("div")
+	tagNameCollection, _ := doc.GetElementsByTagName("div")
 
-	fmt.Println(len(elements), "elements found with tag name: \"div\"")
+	fmt.Println(tagNameCollection.Length(), "elements found with tag name: \"div\"")
 
 	fmt.Println("New HTML Tree:")
 	html.Serialize(docNode)
 
 	collection.Destroy()
+	tagNameCollection.Destroy()
 	doc.Destroy()
 }

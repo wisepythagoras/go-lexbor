@@ -86,11 +86,9 @@ func (e *Element) SetInnerHTML(innerHTML string) error {
 	return nil
 }
 
-func (e *Element) ElementsByAttr(attr string, val string) ([]*Element, error) {
-	elements := make([]*Element, 0)
-
+func (e *Element) ElementsByAttr(attr string, val string) (*Collection, error) {
 	if e.document == nil {
-		return elements, errors.New("No document in context")
+		return nil, errors.New("No document in context")
 	}
 
 	cAttr := (*C.uchar)(unsafe.Pointer(C.CString(attr)))
@@ -111,13 +109,13 @@ func (e *Element) ElementsByAttr(attr string, val string) ([]*Element, error) {
 	)
 
 	if status != C.LXB_STATUS_OK {
-		return elements, errors.New("Unable to get elments by attribute")
+		return nil, errors.New("Unable to get elments by attribute")
 	}
 
-	return collection.Elements(), nil
+	return collection, nil
 }
 
-func (e *Element) ElementsByTagName(tagName string) ([]*Element, error) {
+func (e *Element) ElementsByTagName(tagName string) (*Collection, error) {
 	cTagName := (*C.uchar)(unsafe.Pointer(C.CString(tagName)))
 	tagNameLen := (C.ulong)(len(tagName))
 
@@ -126,13 +124,13 @@ func (e *Element) ElementsByTagName(tagName string) ([]*Element, error) {
 	status := C.lxb_dom_elements_by_tag_name(e.ptr, collection.ptr, cTagName, tagNameLen)
 
 	if status != C.LXB_STATUS_OK {
-		return make([]*Element, 0), errors.New("Unable to get elments by tag name")
+		return nil, errors.New("Unable to get elments by tag name")
 	}
 
-	return collection.Elements(), nil
+	return collection, nil
 }
 
-func (e *Element) ElementsByClassName(className string) ([]*Element, error) {
+func (e *Element) ElementsByClassName(className string) (*Collection, error) {
 	cClassName := (*C.uchar)(unsafe.Pointer(C.CString(className)))
 	classNameLen := (C.ulong)(len(className))
 
@@ -141,10 +139,10 @@ func (e *Element) ElementsByClassName(className string) ([]*Element, error) {
 	status := C.lxb_dom_elements_by_class_name(e.ptr, collection.ptr, cClassName, classNameLen)
 
 	if status != C.LXB_STATUS_OK {
-		return make([]*Element, 0), errors.New("Unable to get elments by tag name")
+		return nil, errors.New("Unable to get elments by tag name")
 	}
 
-	return collection.Elements(), nil
+	return collection, nil
 }
 
 func (e *Element) HTMLElement() *HTMLElement {

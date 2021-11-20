@@ -176,24 +176,24 @@ func (d *Document) CreateTextNode(text string) *DomText {
 }
 
 func (d *Document) GetElementById(id string) (*Element, error) {
-	elements, err := d.BodyElement().Element().ElementsByAttr("id", id)
+	collection, err := d.BodyElement().Element().ElementsByAttr("id", id)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if len(elements) == 0 {
+	if collection.Length() == 0 {
 		return nil, errors.New("Element with this id not found")
 	}
 
-	return elements[0], nil
+	return collection.Elements()[0], nil
 }
 
-func (d *Document) GetElementsByTagName(tagName string) ([]*Element, error) {
+func (d *Document) GetElementsByTagName(tagName string) (*Collection, error) {
 	return d.BodyElement().Element().ElementsByTagName(tagName)
 }
 
-func (d *Document) GetElementsByClassName(tagName string) ([]*Element, error) {
+func (d *Document) GetElementsByClassName(tagName string) (*Collection, error) {
 	return d.BodyElement().Element().ElementsByTagName(tagName)
 }
 

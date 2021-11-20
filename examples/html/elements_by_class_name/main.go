@@ -18,15 +18,15 @@ func main() {
 
 	body := doc.BodyElement()
 
-	elements, _ := body.Element().ElementsByClassName("hello")
+	collection, _ := body.Element().ElementsByClassName("hello")
 
 	fmt.Println("The element:")
-	html.Serialize(elements[0].Node())
+	html.Serialize(collection.Elements()[0].Node())
 
-	elements, _ = body.Element().ElementsByClassName("a")
+	collection, _ = body.Element().ElementsByClassName("a")
 
 	fmt.Println("The element:")
-	html.Serialize(elements[0].Node())
+	html.Serialize(collection.Elements()[0].Node())
 
 	doc.Destroy()
 }

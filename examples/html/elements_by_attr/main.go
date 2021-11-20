@@ -18,10 +18,10 @@ func main() {
 
 	body := doc.BodyElement()
 
-	elements, _ := body.Element().ElementsByAttr("id", "hello")
+	collection, _ := body.Element().ElementsByAttr("id", "hello")
 
 	fmt.Println("The element:")
-	html.Serialize(elements[0].Node())
+	html.Serialize(collection.Elements()[0].Node())
 
 	element, _ := doc.GetElementById("hello")
 
