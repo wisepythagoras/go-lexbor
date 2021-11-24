@@ -7,12 +7,16 @@ import (
 )
 
 type DomText struct {
-	lexborDomText *C.lxb_dom_text_t
+	ptr      *C.lxb_dom_text_t
+	document *Document
 }
 
 func (d *DomText) Node() *Node {
 	lxbNode := (*C.lxb_dom_node_t)(unsafe.Pointer(d.Ptr()))
-	return &Node{ptr: lxbNode}
+	return &Node{
+		ptr:      lxbNode,
+		document: d.document,
+	}
 }
 
 func (d *DomText) HTMLElement() *HTMLElement {
@@ -21,5 +25,5 @@ func (d *DomText) HTMLElement() *HTMLElement {
 }
 
 func (d *DomText) Ptr() *C.lxb_dom_text_t {
-	return d.lexborDomText
+	return d.ptr
 }

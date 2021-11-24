@@ -7,7 +7,8 @@ import (
 )
 
 type Node struct {
-	ptr *C.lxb_dom_node_t
+	ptr      *C.lxb_dom_node_t
+	document *Document
 }
 
 func (n *Node) InsertChild(node *Node) {
@@ -21,7 +22,10 @@ func (n *Node) FirstChild() *Node {
 		return nil
 	}
 
-	return &Node{ptr: nodePtr}
+	return &Node{
+		ptr:      nodePtr,
+		document: n.document,
+	}
 }
 
 func (n *Node) LastChild() *Node {
@@ -31,7 +35,10 @@ func (n *Node) LastChild() *Node {
 		return nil
 	}
 
-	return &Node{ptr: nodePtr}
+	return &Node{
+		ptr:      nodePtr,
+		document: n.document,
+	}
 }
 
 func (n *Node) Parent() *Node {
@@ -41,7 +48,10 @@ func (n *Node) Parent() *Node {
 		return nil
 	}
 
-	return &Node{ptr: nodePtr}
+	return &Node{
+		ptr:      nodePtr,
+		document: n.document,
+	}
 }
 
 func (n *Node) Next() *Node {
@@ -51,7 +61,10 @@ func (n *Node) Next() *Node {
 		return nil
 	}
 
-	return &Node{ptr: nodePtr}
+	return &Node{
+		ptr:      nodePtr,
+		document: n.document,
+	}
 }
 
 func (n *Node) Prev() *Node {
@@ -61,7 +74,10 @@ func (n *Node) Prev() *Node {
 		return nil
 	}
 
-	return &Node{ptr: nodePtr}
+	return &Node{
+		ptr:      nodePtr,
+		document: n.document,
+	}
 }
 
 func (n *Node) Children() []*Node {
@@ -85,6 +101,13 @@ func (n *Node) Children() []*Node {
 func (n *Node) HTMLElement() *HTMLElement {
 	lxbHTMLEl := (*C.lxb_html_element_t)(unsafe.Pointer(n.Ptr()))
 	return &HTMLElement{lexborHTMLEl: lxbHTMLEl}
+}
+
+func (n *Node) Element() *Element {
+	return &Element{
+		ptr:      (*C.lxb_dom_element_t)(unsafe.Pointer(n.ptr)),
+		document: n.document,
+	}
 }
 
 func (n *Node) Ptr() *C.lxb_dom_node_t {

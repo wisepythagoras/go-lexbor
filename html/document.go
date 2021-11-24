@@ -98,7 +98,8 @@ func (d *Document) DomInterfaceNode() *Node {
 	// lexborNode := C.lxb_dom_interface_node_custom(d.ptr)
 
 	node := &Node{
-		ptr: lexborNode,
+		ptr:      lexborNode,
+		document: d,
 	}
 
 	return node
@@ -172,7 +173,10 @@ func (d *Document) CreateTextNode(text string) *DomText {
 		return nil
 	}
 
-	return &DomText{lexborDomText: domText}
+	return &DomText{
+		ptr:      domText,
+		document: d,
+	}
 }
 
 func (d *Document) GetElementById(id string) (*Element, error) {
