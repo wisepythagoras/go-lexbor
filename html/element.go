@@ -152,5 +152,5 @@ func (e *Element) HTMLElement() *HTMLElement {
 
 func (e *Element) Node() *Node {
 	lxbNode := (*C.lxb_dom_node_t)(unsafe.Pointer(e.ptr))
-	return &Node{lexborNode: lxbNode}
+	return &Node{ptr: lxbNode}
 }

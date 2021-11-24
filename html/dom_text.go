@@ -12,7 +12,7 @@ type DomText struct {
 
 func (d *DomText) Node() *Node {
 	lxbNode := (*C.lxb_dom_node_t)(unsafe.Pointer(d.Ptr()))
-	return &Node{lexborNode: lxbNode}
+	return &Node{ptr: lxbNode}
 }
 
 func (d *DomText) HTMLElement() *HTMLElement {

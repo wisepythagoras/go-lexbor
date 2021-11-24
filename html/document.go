@@ -98,7 +98,7 @@ func (d *Document) DomInterfaceNode() *Node {
 	// lexborNode := C.lxb_dom_interface_node_custom(d.ptr)
 
 	node := &Node{
-		lexborNode: lexborNode,
+		ptr: lexborNode,
 	}
 
 	return node
