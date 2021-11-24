@@ -2,7 +2,9 @@ package html
 
 // #include <lexbor/html/html.h>
 import "C"
-import "unsafe"
+import (
+	"unsafe"
+)
 
 type Node struct {
 	ptr *C.lxb_dom_node_t
@@ -60,6 +62,24 @@ func (n *Node) Prev() *Node {
 	}
 
 	return &Node{ptr: nodePtr}
+}
+
+func (n *Node) Children() []*Node {
+	nodes := make([]*Node, 0)
+	firstChild := n.FirstChild()
+
+	if firstChild == nil {
+		return nodes
+	}
+
+	nodes = append(nodes, firstChild)
+	child := firstChild.Next()
+
+	for ; child != nil; child = child.Next() {
+		nodes = append(nodes, child)
+	}
+
+	return nodes
 }
 
 func (n *Node) HTMLElement() *HTMLElement {

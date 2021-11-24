@@ -43,5 +43,7 @@ func main() {
 		fmt.Println("----------")
 	}
 
+	fmt.Println("Children:", len(elements[0].Node().Children()))
+
 	doc.Destroy()
 }
